@@ -10,9 +10,9 @@ from .model import SimpleCNN
 
 
 def train(dataset_root: str, epochs: int = 5) -> SimpleCNN:
-    train_tasks, _ = ARCDataset(dataset_root).load()
+    train_ds, _ = ARCDataset(dataset_root).load()
     # Placeholder dataset transformation
-    train_loader = DataLoader(train_tasks, batch_size=4, shuffle=True)
+    train_loader = DataLoader(train_ds, batch_size=4, shuffle=True)
 
     model = SimpleCNN()
     criterion = nn.CrossEntropyLoss()

@@ -9,8 +9,8 @@ from .model import SimpleCNN
 
 
 def evaluate(model: SimpleCNN, dataset_root: str) -> float:
-    _, test_tasks = ARCDataset(dataset_root).load()
-    test_loader = DataLoader(test_tasks, batch_size=4)
+    _, test_ds = ARCDataset(dataset_root).load()
+    test_loader = DataLoader(test_ds, batch_size=4)
 
     model.eval()
     correct = 0
