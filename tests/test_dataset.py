@@ -14,33 +14,33 @@ class TestDataset(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             ARCDataset(tmp_path)
 
-    def test_missing_split_dirs(self) -> None:
+    def test_missing_split_files(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "train").mkdir()
             with self.assertRaises(FileNotFoundError):
-                ARCDataset(root)
+                ARCDataset(root, "training")
 
     def test_loading_and_access(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "train").mkdir()
-            (root / "test").mkdir()
 
-            data = {
-                "train": [{"input": [[0]], "output": [[1]]}],
-                "test": [{"input": [[2]], "output": [[3]]}],
+            challenges = {
+                "0000": {
+                    "train": [{"input": [[0]], "output": [[1]]}],
+                    "test": [{"input": [[2]]}],
+                }
             }
-            with open(root / "train" / "task.json", "w", encoding="utf-8") as f:
-                json.dump(data, f)
-            with open(root / "test" / "task.json", "w", encoding="utf-8") as f:
-                json.dump(data, f)
+            solutions = {"0000": [[[3]]]} 
 
-            train_ds, test_ds = ARCDataset(root).load()
-            self.assertEqual(len(train_ds), 1)
-            self.assertEqual(len(test_ds), 1)
+            with open(root / "arc-agi_training_challenges.json", "w", encoding="utf-8") as f:
+                json.dump(challenges, f)
+            with open(root / "arc-agi_training_solutions.json", "w", encoding="utf-8") as f:
+                json.dump(solutions, f)
 
-            item = train_ds[0]
+            ds = ARCDataset(root, "training")
+            self.assertEqual(len(ds), 1)
+
+            item = ds[0]
             self.assertIsInstance(item["train"][0][0], torch.Tensor)
 
 

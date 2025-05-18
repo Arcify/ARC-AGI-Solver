@@ -10,7 +10,7 @@ from .model import SimpleCNN
 
 
 def train(dataset_root: str, epochs: int = 5) -> SimpleCNN:
-    train_ds, _ = ARCDataset(dataset_root).load()
+    train_ds = ARCDataset(dataset_root, "training")
     # Placeholder dataset transformation
     train_loader = DataLoader(train_ds, batch_size=4, shuffle=True)
 
