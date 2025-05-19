@@ -95,3 +95,24 @@ class ARCDataset(Dataset):
         train_ds = ARCDataset(self.root, "training")
         eval_ds = ARCDataset(self.root, "evaluation")
         return train_ds, eval_ds
+
+
+def collate_grids(batch: List[Tuple[torch.Tensor, torch.Tensor]]) -> Tuple[torch.Tensor, torch.Tensor]:
+    """Pad a list of grid pairs into tensors for batching."""
+
+    if not batch:
+        raise ValueError("Empty batch provided to collate_grids")
+
+    max_h = max(t[0].shape[0] for t in batch)
+    max_w = max(t[0].shape[1] for t in batch)
+
+    batch_inputs = torch.full((len(batch), 1, max_h, max_w), -1, dtype=torch.long)
+    batch_outputs = torch.full((len(batch), max_h, max_w), -1, dtype=torch.long)
+
+    for i, (inp, out) in enumerate(batch):
+        h, w = inp.shape
+        batch_inputs[i, 0, :h, :w] = inp
+        oh, ow = out.shape
+        batch_outputs[i, :oh, :ow] = out
+
+    return batch_inputs, batch_outputs

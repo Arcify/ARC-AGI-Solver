@@ -10,16 +10,17 @@ class SimpleCNN(nn.Module):
 
     def __init__(self, num_channels: int = 10) -> None:
         super().__init__()
-        self.conv = nn.Sequential(
-            nn.Conv2d(3, 32, kernel_size=3, padding=1),
+        self.encoder = nn.Sequential(
+            nn.Conv2d(1, 32, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=3, padding=1),
             nn.ReLU(),
         )
-        self.fc = nn.Linear(64 * 3 * 3, num_channels)
+        self.head = nn.Sequential(
+            nn.Conv2d(64, num_channels, kernel_size=1),
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        out = self.conv(x)
-        out = out.view(out.size(0), -1)
-        out = self.fc(out)
+        out = self.encoder(x.float())
+        out = self.head(out)
         return out
