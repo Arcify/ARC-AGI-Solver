@@ -6,7 +6,8 @@ This repository contains tooling and experiments aimed at solving the
 ## Repository layout
 
 - `solver/` – Python package containing the core modules used for dataset
-  handling, model definition, training and evaluation.
+  handling, model definition, training, evaluation and the program synthesis
+  DSL.
 - `tests/` – Basic tests to ensure the project loads correctly.
 - `requirements.txt` – Python dependencies.
 
@@ -29,3 +30,7 @@ pytest
 The `solver.train` module contains a `train` function that expects a dataset
 layout as described in `solver/dataset.py`. The implementation is currently a
 placeholder and should be extended with proper ARC grid handling.
+
+The `solver.synthesizer` module implements a simple neural-guided search over a
+domain specific language defined in `solver.dsl`. It can be used to synthesize
+short programs that transform grids to match training examples.
