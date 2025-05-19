@@ -5,14 +5,18 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from .dataset import ARCDataset
+from .dataset import ARCDataset, collate_grids
 from .model import SimpleCNN
 
 
 def train(dataset_root: str, epochs: int = 5) -> SimpleCNN:
     train_ds = ARCDataset(dataset_root, "training")
-    # Placeholder dataset transformation
-    train_loader = DataLoader(train_ds, batch_size=4, shuffle=True)
+
+    pairs = []
+    for task in train_ds:
+        pairs.extend(task["train"])
+
+    train_loader = DataLoader(pairs, batch_size=4, shuffle=True, collate_fn=collate_grids)
 
     model = SimpleCNN()
     criterion = nn.CrossEntropyLoss()
@@ -20,11 +24,9 @@ def train(dataset_root: str, epochs: int = 5) -> SimpleCNN:
 
     model.train()
     for _ in range(epochs):
-        for batch in train_loader:
+        for inputs, targets in train_loader:
             optimizer.zero_grad()
-            # TODO: implement proper training using grid pairs
-            outputs = model(torch.randn(4, 3, 3, 3))
-            targets = torch.randint(0, 10, (4,))
+            outputs = model(inputs)
             loss = criterion(outputs, targets)
             loss.backward()
             optimizer.step()
