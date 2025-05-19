@@ -3,24 +3,34 @@ import json
 import unittest
 import tempfile
 
-import torch
-
-from solver.dataset import ARCDataset
+try:
+    import torch
+except ImportError:  # pragma: no cover - torch may not be installed in CI
+    torch = None  # type: ignore
+    ARCDataset = None
+else:
+    from solver.dataset import ARCDataset
 
 
 class TestDataset(unittest.TestCase):
     def test_missing_dataset(self) -> None:
+        if ARCDataset is None:
+            self.skipTest("torch not installed")
         tmp_path = Path("nonexistent_dir")
         with self.assertRaises(FileNotFoundError):
             ARCDataset(tmp_path)
 
     def test_missing_split_files(self) -> None:
+        if ARCDataset is None:
+            self.skipTest("torch not installed")
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             with self.assertRaises(FileNotFoundError):
                 ARCDataset(root, "training")
 
     def test_loading_and_access(self) -> None:
+        if ARCDataset is None:
+            self.skipTest("torch not installed")
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
 
@@ -41,6 +51,8 @@ class TestDataset(unittest.TestCase):
             self.assertEqual(len(ds), 1)
 
             item = ds[0]
+            if torch is None:
+                self.skipTest("torch is not installed")
             self.assertIsInstance(item["train"][0][0], torch.Tensor)
 
 
